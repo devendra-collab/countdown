@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown to July 15</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,500;1,600&family=Sora:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#140F1F;
+    --bg-mid:#1F1730;
+    --cream:#F7F1E8;
+    --gold:#F4B942;
+    --coral:#FF6B6B;
+    --lavender:#9A8FB5;
+    --card-radius:28px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg-deep);
+    color:var(--cream);
+    font-family:'Sora', sans-serif;
+    overflow-x:hidden;
+  }
+
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    position:relative;
+  }
+
+  /* animated mesh background */
+  .mesh{
+    position:fixed;
+    inset:-10%;
+    z-index:0;
+    background:
+      radial-gradient(ellipse 40% 35% at 18% 15%, rgba(244,185,66,0.16), transparent 60%),
+      radial-gradient(ellipse 45% 40% at 85% 80%, rgba(255,107,107,0.15), transparent 60%),
+      radial-gradient(ellipse 35% 30% at 75% 15%, rgba(154,143,181,0.12), transparent 60%),
+      radial-gradient(ellipse 40% 35% at 15% 85%, rgba(244,185,66,0.10), transparent 60%),
+      var(--bg-deep);
+    animation:mesh-shift 16s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes mesh-shift{
+    0%,100%{ filter:hue-rotate(0deg); transform:scale(1) rotate(0deg); }
+    50%{ filter:hue-rotate(8deg); transform:scale(1.05) rotate(1deg); }
+  }
+
+  /* cursor spotlight */
+  .spotlight{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:radial-gradient(circle 280px at var(--mx,50%) var(--my,50%), rgba(244,185,66,0.07), transparent 70%);
+    transition:background 0.05s linear;
+  }
+
+  .ambient{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+  }
+  .blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(70px);
+    opacity:0.35;
+    animation:drift 22s ease-in-out infinite;
+  }
+  .blob.b1{ width:280px; height:280px; background:var(--gold); top:-60px; left:-60px; animation-delay:0s; }
+  .blob.b2{ width:240px; height:240px; background:var(--coral); bottom:-60px; right:-40px; animation-delay:4s; }
+  .blob.b3{ width:200px; height:200px; background:var(--lavender); top:40%; right:10%; animation-delay:9s; opacity:0.22;}
+
+  @keyframes drift{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    33%{ transform:translate(20px,-30px) scale(1.08); }
+    66%{ transform:translate(-15px,20px) scale(0.95); }
+  }
+
+  .sparkle{
+    position:absolute;
+    width:3px; height:3px;
+    background:var(--cream);
+    border-radius:50%;
+    opacity:0.5;
+    animation:twinkle 3.5s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:0.15; transform:scale(1); }
+    50%{ opacity:0.8; transform:scale(1.6); }
+  }
+
+  /* card */
+  .stage{
+    perspective:1200px;
+    position:relative;
+    z-index:2;
+  }
+  .ticket{
+    position:relative;
+    width:100%;
+    max-width:520px;
+    background:linear-gradient(165deg, var(--bg-mid), #190f2a 80%);
+    border:1px solid rgba(247,241,232,0.08);
+    border-radius:var(--card-radius);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(244,185,66,0.04), 0 0 0 0 rgba(244,185,66,0);
+    padding:40px 38px 32px;
+    text-align:center;
+    transform-style:preserve-3d;
+    will-change:transform;
+    transition:box-shadow 0.4s ease;
+    animation:rise 0.8s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .ticket.ring{
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(244,185,66,0.04), 0 0 24px 2px rgba(244,185,66,0.18);
+  }
+  @keyframes rise{
+    from{ opacity:0; transform:translateY(28px) scale(0.97); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(10px);
+    animation:reveal-in 0.6s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes reveal-in{
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:18px;
+    animation-delay:0.05s;
+  }
+  .eyebrow .star{
+    display:inline-block;
+    animation:spin-twinkle 4s linear infinite;
+  }
+  @keyframes spin-twinkle{
+    0%{ transform:rotate(0deg) scale(1); }
+    50%{ transform:rotate(180deg) scale(1.3); }
+    100%{ transform:rotate(360deg) scale(1); }
+  }
+  .eyebrow::before, .eyebrow::after{
+    content:"";
+    height:1px;
+    width:28px;
+    background:rgba(244,185,66,0.4);
+  }
+
+  .headline{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:clamp(28px, 6vw, 38px);
+    line-height:1.15;
+    margin:0 0 6px;
+    animation-delay:0.12s;
+  }
+  .headline .name{
+    border-bottom:1px dashed rgba(247,241,232,0.35);
+    padding-bottom:2px;
+    cursor:text;
+    outline:none;
+    transition:border-color 0.2s ease, text-shadow 0.3s ease;
+  }
+  .headline .name:focus{
+    border-bottom-color:var(--gold);
+    text-shadow:0 0 16px rgba(244,185,66,0.4);
+  }
+  .headline .name:empty::before{
+    content:"Your";
+    color:rgba(247,241,232,0.4);
+  }
+
+  .date-line{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--lavender);
+    letter-spacing:0.06em;
+    margin-bottom:30px;
+    animation-delay:0.18s;
+  }
+
+  .perf{
+    position:relative;
+    height:1px;
+    margin:0 -38px 30px;
+    background-image:repeating-linear-gradient(to right, rgba(247,241,232,0.18) 0 6px, transparent 6px 14px);
+    animation-delay:0.22s;
+  }
+  .perf::before, .perf::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:24px; height:24px;
+    background:var(--bg-deep);
+    border-radius:50%;
+    transform:translateY(-50%);
+  }
+  .perf::before{ left:-12px; }
+  .perf::after{ right:-12px; }
+
+  /* flip countdown digits */
+  .digits{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:8px;
+    margin-bottom:8px;
+    animation-delay:0.28s;
+  }
+  .digit-group{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .digit-flip{
+    perspective:300px;
+    width:100%;
+    height:clamp(40px, 11vw, 56px);
+  }
+  .flip-card{
+    position:relative;
+    width:100%;
+    height:100%;
+    transform-style:preserve-3d;
+    transition:transform 0.5s cubic-bezier(.45,0,.2,1);
+  }
+  .flip-card.flipped{
+    transform:rotateY(180deg);
+  }
+  .flip-face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(34px, 9vw, 46px);
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+    color:var(--cream);
+  }
+  .flip-back{
+    transform:rotateY(180deg);
+    color:var(--gold);
+  }
+  .digit-label{
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--lavender);
+    margin-top:8px;
+  }
+
+  .progress-wrap{
+    margin:26px 0 30px;
+    text-align:left;
+    animation-delay:0.34s;
+  }
+  .progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    color:var(--lavender);
+    margin-bottom:8px;
+    text-transform:uppercase;
+  }
+  .progress-track{
+    height:6px;
+    border-radius:4px;
+    background:rgba(247,241,232,0.08);
+    overflow:hidden;
+    position:relative;
+  }
+  .progress-fill{
+    height:100%;
+    border-radius:4px;
+    background:linear-gradient(90deg, var(--coral), var(--gold));
+    width:0%;
+    transition:width 0.6s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .progress-fill::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+    background-size:200% 100%;
+    animation:shimmer 2.2s linear infinite;
+  }
+  @keyframes shimmer{
+    0%{ background-position:200% 0; }
+    100%{ background-position:-50% 0; }
+  }
+
+  .candle-zone{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin:6px 0 28px;
+    position:relative;
+    animation-delay:0.4s;
+  }
+  .candle-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:8px;
+    border-radius:14px;
+    position:relative;
+    transition:transform 0.2s ease;
+  }
+  .candle-btn:hover{ transform:translateY(-2px); }
+  .candle-btn:active{ transform:translateY(1px) scale(0.97); }
+  .candle-btn:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:3px;
+  }
+  .candle-hint{
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    color:rgba(154,143,181,0.7);
+    letter-spacing:0.06em;
+    margin-top:4px;
+  }
+
+  .embers{
+    position:absolute;
+    top:-10px; left:50%;
+    width:1px; height:1px;
+    pointer-events:none;
+  }
+  .ember{
+    position:absolute;
+    width:3px; height:3px;
+    border-radius:50%;
+    background:var(--gold);
+    opacity:0;
+    animation:ember-float 3s ease-in infinite;
+  }
+  @keyframes ember-float{
+    0%{ opacity:0; transform:translate(0,0) scale(1); }
+    15%{ opacity:0.9; }
+    100%{ opacity:0; transform:translate(var(--ex,8px), -54px) scale(0.3); }
+  }
+
+  .flame{
+    transform-origin:50% 100%;
+    animation:flicker 2.6s ease-in-out infinite;
+    filter:drop-shadow(0 0 10px rgba(244,185,66,0.65));
+  }
+  @keyframes flicker{
+    0%,100%{ transform:scale(1,1) rotate(0deg); }
+    20%{ transform:scale(0.96,1.05) rotate(-2deg); }
+    45%{ transform:scale(1.05,0.95) rotate(2deg); }
+    65%{ transform:scale(0.98,1.02) rotate(-1deg); }
+    85%{ transform:scale(1.03,0.97) rotate(1deg); }
+  }
+  .flame.out{
+    animation:none;
+    opacity:0;
+    transition:opacity 0.6s ease;
+  }
+  .smoke{ opacity:0; }
+  .smoke.show{
+    animation:smoke-rise 1.8s ease-out forwards;
+  }
+  @keyframes smoke-rise{
+    0%{ opacity:0.6; transform:translateY(0) scale(1); }
+    100%{ opacity:0; transform:translateY(-22px) scale(1.8); }
+  }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    animation-delay:0.46s;
+  }
+  .btn{
+    font-family:'Sora', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    padding:12px 18px;
+    border-radius:999px;
+    border:1px solid rgba(247,241,232,0.16);
+    background:rgba(247,241,232,0.04);
+    color:var(--cream);
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+  }
+  .btn::before{
+    content:"";
+    position:absolute;
+    top:0; left:-60%;
+    width:50%; height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform:skewX(-20deg);
+    transition:left 0.6s ease;
+  }
+  .btn:hover::before{ left:130%; }
+  .btn:hover{
+    background:rgba(247,241,232,0.09);
+    border-color:rgba(244,185,66,0.4);
+    transform:translateY(-2px);
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn.primary{
+    background:linear-gradient(120deg, var(--gold), var(--coral));
+    color:#1a1025;
+    border:none;
+  }
+  .btn.primary:hover{ filter:brightness(1.06); }
+  .btn:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:2px;
+  }
+
+  .celebrate-text{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:clamp(24px,6vw,32px);
+    margin:0 0 22px;
+    display:none;
+    animation:pop-in 0.5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes pop-in{
+    0%{ opacity:0; transform:scale(0.8); }
+    60%{ opacity:1; transform:scale(1.06); }
+    100%{ transform:scale(1); }
+  }
+  .ticket.done .digits,
+  .ticket.done .progress-wrap,
+  .ticket.done .perf{ display:none; }
+  .ticket.done .celebrate-text{ display:block; }
+
+  canvas#confetti{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:5;
+  }
+
+  @media (max-width:420px){
+    .ticket{ padding:32px 22px 26px; }
+    .digits{ grid-template-columns:repeat(2,1fr); row-gap:18px; }
+    .perf{ margin-left:-22px; margin-right:-22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .blob, .sparkle, .flame, .ticket, .mesh, .ember, .progress-fill::after, .eyebrow .star{ animation:none !important; }
+    .ticket{ transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mesh"></div>
+<div class="spotlight" id="spotlight"></div>
+<div class="ambient" id="ambient"></div>
+<canvas id="confetti"></canvas>
+
+<div class="stage">
+<main class="ticket" id="ticket">
+  <p class="eyebrow reveal"><span class="star">✶</span> Countdown <span class="star">✶</span></p>
+  <h1 class="headline reveal">
+    <span class="name" contenteditable="true" spellcheck="false" aria-label="Edit name">Dristi</span>'s Birthday
+  </h1>
+  <p class="date-line reveal">JULY&nbsp;15 · MARK THE CALENDAR</p>
+
+  <div class="perf reveal" aria-hidden="true"></div>
+
+  <p class="celebrate-text">It's here! 🎂✨</p>
+
+  <div class="digits reveal">
+    <div class="digit-group">
+      <div class="digit-flip" id="flip-days">
+        <div class="flip-card">
+          <div class="flip-face flip-front">00</div>
+          <div class="flip-face flip-back">00</div>
+        </div>
+      </div>
+      <span class="digit-label">Days</span>
+    </div>
+    <div class="digit-group">
+      <div class="digit-flip" id="flip-hours">
+        <div class="flip-card">
+          <div class="flip-face flip-front">00</div>
+          <div class="flip-face flip-back">00</div>
+        </div>
+      </div>
+      <span class="digit-label">Hrs</span>
+    </div>
+    <div class="digit-group">
+      <div class="digit-flip" id="flip-mins">
+        <div class="flip-card">
+          <div class="flip-face flip-front">00</div>
+          <div class="flip-face flip-back">00</div>
+        </div>
+      </div>
+      <span class="digit-label">Min</span>
+    </div>
+    <div class="digit-group">
+      <div class="digit-flip" id="flip-secs">
+        <div class="flip-card">
+          <div class="flip-face flip-front">00</div>
+          <div class="flip-face flip-back">00</div>
+        </div>
+      </div>
+      <span class="digit-label">Sec</span>
+    </div>
+  </div>
+
+  <div class="progress-wrap reveal">
+    <div class="progress-label">
+      <span id="progress-pct">0% there</span>
+      <span>since last birthday</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="candle-zone reveal">
+    <button class="candle-btn" id="candleBtn" aria-label="Tap to light or blow the candle">
+      <div class="embers" id="embers"></div>
+      <svg width="64" height="84" viewBox="0 0 64 84" fill="none">
+        <g id="flameGroup" class="flame">
+          <ellipse cx="32" cy="20" rx="9" ry="14" fill="url(#flameGrad)"/>
+          <ellipse cx="32" cy="24" rx="4.5" ry="7" fill="#FFE9B8"/>
+        </g>
+        <g id="smokeGroup" class="smoke">
+          <path d="M32 22 C 28 14, 36 8, 32 0" stroke="rgba(247,241,232,0.5)" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </g>
+        <rect x="24" y="34" width="16" height="42" rx="3" fill="#F7F1E8"/>
+        <rect x="24" y="34" width="16" height="6" fill="#FF6B6B"/>
+        <rect x="24" y="48" width="16" height="6" fill="#FF6B6B"/>
+        <rect x="24" y="62" width="16" height="6" fill="#FF6B6B"/>
+        <defs>
+          <linearGradient id="flameGrad" x1="32" y1="6" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FF6B6B"/>
+            <stop offset="1" stop-color="#F4B942"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </button>
+    <span class="candle-hint">tap the flame ✨</span>
+  </div>
+
+  <div class="actions reveal">
+    <button class="btn primary" id="calendarBtn">Add to calendar</button>
+    <button class="btn" id="shareBtn">Copy countdown</button>
+  </div>
+</main>
+</div>
+
+<script>
+(function(){
+  // ---------- ambient sparkles ----------
+  const ambient = document.getElementById('ambient');
+  ambient.innerHTML = '<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>';
+  for(let i=0;i<22;i++){
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*3.5)+'s';
+    ambient.appendChild(s);
+  }
+
+  // ---------- entrance stagger ----------
+  document.querySelectorAll('.reveal').forEach((el, i) => {
+    el.style.animationDelay = (0.15 + i*0.08) + 's';
+  });
+
+  // ---------- ember particles near candle ----------
+  const embers = document.getElementById('embers');
+  for(let i=0;i<6;i++){
+    const e = document.createElement('div');
+    e.className = 'ember';
+    e.style.left = (Math.random()*10-5)+'px';
+    e.style.setProperty('--ex', (Math.random()*16-8)+'px');
+    e.style.animationDelay = (Math.random()*3)+'s';
+    e.style.animationDuration = (2.4+Math.random()*1.6)+'s';
+    embers.appendChild(e);
+  }
+
+  // ---------- card tilt on mouse move ----------
+  const stage = document.querySelector('.stage');
+  const ticket = document.getElementById('ticket');
+  const spotlight = document.getElementById('spotlight');
+  let tiltEnabled = window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+                    && window.matchMedia('(pointer: fine)').matches;
+
+  window.addEventListener('mousemove', (e) => {
+    spotlight.style.setProperty('--mx', e.clientX+'px');
+    spotlight.style.setProperty('--my', e.clientY+'px');
+    if(!tiltEnabled) return;
+    const rect = stage.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    const dx = (e.clientX - cx)/rect.width;
+    const dy = (e.clientY - cy)/rect.height;
+    const rotY = Math.max(-8, Math.min(8, dx*14));
+    const rotX = Math.max(-8, Math.min(8, -dy*14));
+    ticket.style.transform = 'rotateY('+rotY+'deg) rotateX('+rotX+'deg)';
+  });
+  window.addEventListener('mouseleave', () => {
+    ticket.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  });
+
+  // ---------- countdown target ----------
+  const TARGET_MONTH = 7; // July
+  const TARGET_DAY = 15;
+
+  function getTarget(){
+    const now = new Date();
+    let year = now.getFullYear();
+    let t = new Date(year, TARGET_MONTH-1, TARGET_DAY, 0,0,0,0);
+    if (t.getTime() <= now.getTime()) t = new Date(year+1, TARGET_MONTH-1, TARGET_DAY);
+    return t;
+  }
+  function getPrevBirthday(target){
+    const prev = new Date(target);
+    prev.setFullYear(target.getFullYear()-1);
+    return prev;
+  }
+
+  let target = getTarget();
+  let prevB = getPrevBirthday(target);
+
+  const fill = document.getElementById('progress-fill');
+  const pct = document.getElementById('progress-pct');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  // ---------- flip digit setter ----------
+  function setFlip(groupId, value){
+    const root = document.getElementById(groupId);
+    const card = root.querySelector('.flip-card');
+    const front = card.querySelector('.flip-front');
+    const back = card.querySelector('.flip-back');
+    if (front.textContent === value) return;
+    if (card.dataset.animating === '1') {
+      // settle any in-flight animation instantly before starting a new one
+      card.style.transition = 'none';
+      card.classList.remove('flipped');
+      front.textContent = back.textContent || front.textContent;
+      void card.offsetWidth;
+      card.style.transition = '';
+    }
+    back.textContent = value;
+    card.dataset.animating = '1';
+    card.classList.add('flipped');
+    const onEnd = () => {
+      front.textContent = value;
+      card.classList.remove('flipped');
+      card.style.transition = 'none';
+      void card.offsetWidth;
+      card.style.transition = '';
+      card.dataset.animating = '0';
+      card.removeEventListener('transitionend', onEnd);
+    };
+    card.addEventListener('transitionend', onEnd);
+  }
+
+  let tickCount = 0;
+  function tick(){
+    const now = new Date();
+    const diff = target.getTime() - now.getTime();
+
+    if (diff <= 0){
+      if(!document.getElementById('ticket').classList.contains('done')){
+        celebrate();
+      }
+      return;
+    }
+
+    const days = Math.floor(diff/86400000);
+    const hours = Math.floor((diff%86400000)/3600000);
+    const mins = Math.floor((diff%3600000)/60000);
+    const secs = Math.floor((diff%60000)/1000);
+
+    setFlip('flip-days', pad(days));
+    setFlip('flip-hours', pad(hours));
+    setFlip('flip-mins', pad(mins));
+    setFlip('flip-secs', pad(secs));
+
+    const totalSpan = target.getTime() - prevB.getTime();
+    const elapsed = now.getTime() - prevB.getTime();
+    const p = Math.min(100, Math.max(0, (elapsed/totalSpan)*100));
+    fill.style.width = p.toFixed(1)+'%';
+    pct.textContent = Math.round(p)+'% there';
+
+    tickCount++;
+    document.getElementById('ticket').classList.toggle('ring', tickCount % 2 === 0);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+
+  // ---------- celebration ----------
+  function celebrate(){
+    const ticketEl = document.getElementById('ticket');
+    ticketEl.classList.add('done');
+    const flame = document.getElementById('flameGroup');
+    const smoke = document.getElementById('smokeGroup');
+    flame.classList.add('out');
+    smoke.classList.add('show');
+    burstConfetti();
+  }
+
+  // ---------- candle tap interaction ----------
+  const candleBtn = document.getElementById('candleBtn');
+  const flameGroup = document.getElementById('flameGroup');
+  const smokeGroup = document.getElementById('smokeGroup');
+  let lit = true;
+  candleBtn.addEventListener('click', () => {
+    if (document.getElementById('ticket').classList.contains('done')) return;
+    lit = !lit;
+    if (!lit){
+      flameGroup.classList.add('out');
+      smokeGroup.classList.remove('show');
+      void smokeGroup.offsetWidth;
+      smokeGroup.classList.add('show');
+      setTimeout(() => {
+        flameGroup.classList.remove('out');
+        lit = true;
+      }, 2400);
+    }
+  });
+
+  // ---------- confetti ----------
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const colors = ['#F4B942','#FF6B6B','#F7F1E8','#9A8FB5'];
+  function burstConfetti(){
+    const particles = [];
+    const count = 140;
+    for(let i=0;i<count;i++){
+      particles.push({
+        x: canvas.width/2 + (Math.random()-0.5)*120,
+        y: canvas.height/2 + (Math.random()-0.5)*60,
+        vx: (Math.random()-0.5)*9,
+        vy: Math.random()*-9 - 3,
+        size: 4+Math.random()*5,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        rot: Math.random()*360,
+        vrot: (Math.random()-0.5)*12,
+        life: 0
+      });
+    }
+    let frame = 0;
+    const maxFrames = 220;
+    function loop(){
+      frame++;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        p.vy += 0.18;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vrot;
+        p.life++;
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot*Math.PI/180);
+        ctx.globalAlpha = Math.max(0, 1 - frame/maxFrames);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+        ctx.restore();
+      });
+      if (frame < maxFrames){
+        requestAnimationFrame(loop);
+      } else {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+      }
+    }
+    loop();
+  }
+
+  // ---------- add to calendar ----------
+  document.getElementById('calendarBtn').addEventListener('click', () => {
+    const nameEl = document.querySelector('.headline .name');
+    const name = (nameEl.textContent || 'Your').trim();
+    const t = target;
+    const y = t.getFullYear();
+    const m = String(t.getMonth()+1).padStart(2,'0');
+    const d = String(t.getDate()).padStart(2,'0');
+    const nextDay = new Date(t); nextDay.setDate(nextDay.getDate()+1);
+    const y2 = nextDay.getFullYear();
+    const m2 = String(nextDay.getMonth()+1).padStart(2,'0');
+    const d2 = String(nextDay.getDate()).padStart(2,'0');
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Birthday Countdown//EN',
+      'BEGIN:VEVENT',
+      'UID:'+Date.now()+'@birthday-countdown',
+      'DTSTAMP:'+y+m+d+'T000000Z',
+      'DTSTART;VALUE=DATE:'+y+m+d,
+      'DTEND;VALUE=DATE:'+y2+m2+d2,
+      'SUMMARY:'+name+'\\'+'s Birthday \uD83C\uDF82',
+      'DESCRIPTION:Happy Birthday!',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([ics], {type:'text/calendar'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (name+'-birthday.ics').replace(/\s+/g,'-');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // ---------- copy share message ----------
+  document.getElementById('shareBtn').addEventListener('click', async (e) => {
+    const nameEl = document.querySelector('.headline .name');
+    const name = (nameEl.textContent || 'Your').trim();
+    const daysEl = document.querySelector('#flip-days .flip-front');
+    const days = daysEl.textContent;
+    const msg = days+' days to go until '+name+'\'s birthday on July 15! \uD83C\uDF89';
+    const btn = e.currentTarget;
+    try{
+      await navigator.clipboard.writeText(msg);
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(()=>{ btn.textContent = original; }, 1600);
+    } catch(err){
+      btn.textContent = 'Copy failed';
+      setTimeout(()=>{ btn.textContent = 'Copy countdown'; }, 1600);
+    }
+  });
+})();
+</script>
+</body>
+</html>
