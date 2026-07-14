@@ -414,7 +414,12 @@
   .ticket.done .celebrate-text { display: block; }
 
   @media (max-width: 480px){
-    .ticket { padding: 32px 24px; }
+    .ticket { 
+      padding: 32px 24px; 
+      backdrop-filter: none;
+      background: rgba(20, 20, 30, 0.95);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
     .digits { gap: 8px; }
     .perf { margin-left: -24px; margin-right: -24px; }
   }
@@ -434,13 +439,16 @@
 <main class="ticket" id="ticket">
   <p class="eyebrow reveal"><span class="star">✦</span> Countdown <span class="star">✦</span></p>
   <h1 class="headline reveal">
-    <span class="name" contenteditable="true" spellcheck="false" aria-label="Edit name">Dristi</span>'s Birthday
+    <span class="name" contenteditable="true" spellcheck="false" aria-label="Edit name">Drishti</span>'s Birthday
   </h1>
   <p class="date-line reveal">JULY&nbsp;15 · MARK THE CALENDAR</p>
 
   <div class="perf reveal" aria-hidden="true"></div>
 
-  <p class="celebrate-text">The magic is here! ✨</p>
+  <div class="celebrate-text">
+    <p style="font-size: 24px; margin-bottom: 20px;">🎉 Happy Birthday, Drishti! 🎂</p>
+    <a href="gifts.html" class="btn primary" style="text-decoration: none; display: inline-block;">Continue &rarr;</a>
+  </div>
 
   <div class="digits reveal">
     <div class="digit-group">
@@ -555,7 +563,9 @@
     starCanvas.width = window.innerWidth;
     starCanvas.height = window.innerHeight;
     stars = [];
-    for(let i=0; i<150; i++) {
+    const isMobile = window.innerWidth < 768;
+    const numStars = isMobile ? 50 : 150;
+    for(let i=0; i<numStars; i++) {
       stars.push({
         x: Math.random() * starCanvas.width,
         y: Math.random() * starCanvas.height,
@@ -615,19 +625,25 @@
   window.addEventListener('mousemove', (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
+    
+    const isMobile = window.innerWidth < 768;
+
     // Add particle
-    particles.push({
-      x: mouse.x,
-      y: mouse.y,
-      vx: (Math.random() - 0.5) * 2,
-      vy: (Math.random() - 0.5) * 2 + 1,
-      life: 1,
-      color: Math.random() > 0.5 ? '#00F3FF' : '#B53CFF'
-    });
+    if (!isMobile || Math.random() > 0.5) {
+      particles.push({
+        x: mouse.x,
+        y: mouse.y,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2 + 1,
+        life: 1,
+        color: Math.random() > 0.5 ? '#00F3FF' : '#B53CFF'
+      });
+    }
 
     // Prank image trail
     const now = Date.now();
-    if (now - lastSpawn > 150) {
+    const throttleTime = isMobile ? 500 : 150;
+    if (now - lastSpawn > throttleTime) {
       lastSpawn = now;
       
       const el = document.createElement('img');
@@ -669,6 +685,10 @@
 
   // Background random prank spawners
   setInterval(() => {
+      const isMobile = window.innerWidth < 768;
+      // Skip spawning 66% of the time on mobile
+      if (isMobile && Math.random() > 0.33) return;
+
       const img = document.createElement('img');
       img.src = bgPrankUrls[Math.floor(Math.random() * bgPrankUrls.length)];
       img.style.position = 'fixed';
@@ -714,8 +734,10 @@
       trailCtx.fillStyle = p.color;
       trailCtx.globalAlpha = p.life;
       trailCtx.fill();
-      trailCtx.shadowBlur = 10;
-      trailCtx.shadowColor = p.color;
+      if (window.innerWidth >= 768) {
+        trailCtx.shadowBlur = 10;
+        trailCtx.shadowColor = p.color;
+      }
       trailCtx.globalAlpha = 1;
       trailCtx.shadowBlur = 0;
     }

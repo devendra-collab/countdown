@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose Your Gift!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0b0c10;
+      --neon-blue: #00F3FF;
+      --neon-purple: #B53CFF;
+      --neon-pink: #FF3366;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-base);
+      color: #fff;
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Backgrounds */
+    .aurora-container {
+      position: fixed; inset: 0; z-index: -2;
+      overflow: hidden; pointer-events: none;
+    }
+    .aurora {
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(181, 60, 255, 0.15), transparent 60%),
+                  radial-gradient(circle at 80% 20%, rgba(0, 243, 255, 0.15), transparent 50%),
+                  radial-gradient(circle at 20% 80%, rgba(255, 51, 102, 0.1), transparent 50%);
+      animation: aurora-shift 15s ease-in-out infinite alternate;
+      filter: blur(60px);
+    }
+    @keyframes aurora-shift {
+      0% { transform: rotate(0deg) scale(1); }
+      100% { transform: rotate(5deg) scale(1.1) translate(-2%, 2%); }
+    }
+    #stars-canvas {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-top: 60px;
+      padding: 0 20px;
+      max-width: 800px;
+    }
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(32px, 8vw, 56px);
+      font-style: italic;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(181, 60, 255, 0.3);
+    }
+    p.subtitle {
+      font-size: clamp(14px, 4vw, 18px);
+      color: rgba(255,255,255,0.7);
+      line-height: 1.5;
+    }
+
+    /* Gifts Grid */
+    .gifts-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      padding: 40px 20px;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .gift-card {
+      width: 160px;
+      height: 220px;
+      background: rgba(20, 20, 30, 0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .gift-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(181, 60, 255, 0.3);
+      border-color: rgba(181, 60, 255, 0.5);
+    }
+    .gift-card.rejected {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(100%);
+    }
+    .gift-card.rejected::after {
+      content: '❌';
+      position: absolute;
+      font-size: 60px;
+    }
+    .gift-icon {
+      font-size: 64px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    }
+    .gift-label {
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-content {
+      background: rgba(20, 20, 30, 0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .gift-image-preview {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-title {
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .actions-container {
+      position: relative;
+      height: 60px; /* Space for buttons */
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .btn {
+      font-family: 'Space Mono', monospace;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-reject {
+      background: rgba(255, 51, 102, 0.2);
+      color: var(--neon-pink);
+      border: 1px solid var(--neon-pink);
+    }
+    .btn-reject:hover {
+      background: var(--neon-pink);
+      color: #fff;
+    }
+    .btn-accept {
+      background: var(--neon-blue);
+      color: #000;
+      position: relative; /* For JS absolute positioning */
+      z-index: 10;
+    }
+    .btn-accept:hover {
+      box-shadow: 0 0 15px var(--neon-blue);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 15px 25px;
+      border-radius: 50px;
+      font-size: 16px;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 1000;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    #confetti-canvas-full {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      .gift-card { width: 140px; height: 190px; }
+      .actions-container { height: 120px; flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="aurora-container">
+    <div class="aurora"></div>
+  </div>
+  <canvas id="stars-canvas"></canvas>
+
+  <header>
+    <h1>🎂 Happy Birthday, Drishti!</h1>
+    <p class="subtitle">Every birthday deserves a surprise...<br>Now it's time to choose your birthday gift! 🎁</p>
+  </header>
+
+  <div class="gifts-grid" id="gifts-grid">
+    <!-- Gifts generated by JS -->
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content" id="modal-box">
+      <h2 class="modal-title" id="modal-title">Is this your gift?</h2>
+      <img src="" alt="Gift" class="gift-image-preview" id="modal-image">
+      <div class="actions-container" id="actions-container">
+        <button class="btn btn-reject" id="btn-reject">❌ Reject</button>
+        <button class="btn btn-accept" id="btn-accept">✅ Accept</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Acha... next gift try karo 😂</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    // --- Configuration: Edit these URLs ---
+    const giftImages = [
+      'gifts/lassi.png', // Gift 1 (Prank)
+      'gifts/rolex.png', // Gift 2 (Prank)
+      'gifts/afgan.png', // Gift 3 (Prank)
+      'gifts/maldives.png', // Gift 4 (Prank)
+      'gifts/lambo.png' // Final Gift (5)
+    ];
+
+    // --- State ---
+    let currentGiftIndex = null;
+    let prankActive = false;
+
+    // --- UI Elements ---
+    const grid = document.getElementById('gifts-grid');
+    const modal = document.getElementById('modal');
+    const modalImage = document.getElementById('modal-image');
+    const btnAccept = document.getElementById('btn-accept');
+    const btnReject = document.getElementById('btn-reject');
+    const actionsContainer = document.getElementById('actions-container');
+    const toastEl = document.getElementById('toast');
+    const modalTitle = document.getElementById('modal-title');
+
+    // --- Initialize Gifts ---
+    for (let i = 0; i < 5; i++) {
+      const card = document.createElement('div');
+      card.className = 'gift-card';
+      card.id = `gift-${i}`;
+      card.innerHTML = `
+        <div class="gift-icon">🎁</div>
+        <div class="gift-label">Gift ${i + 1}</div>
+      `;
+      card.onclick = () => openGift(i);
+      grid.appendChild(card);
+    }
+
+    // --- Modal Logic ---
+    function openGift(index) {
+      currentGiftIndex = index;
+      modalImage.src = giftImages[index];
+      
+      // Reset button styles
+      btnAccept.style.position = 'relative';
+      btnAccept.style.left = '0';
+      btnAccept.style.top = '0';
+      btnReject.style.display = 'inline-block';
+      modalTitle.innerText = "Is this your gift?";
+
+      if (index === 4) {
+        // Final Gift - No Prank
+        prankActive = false;
+        btnReject.style.display = 'none'; // Hide reject for the final gift
+      } else {
+        // Prank Gifts (0 to 3)
+        prankActive = true;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      prankActive = false;
+    }
+
+    // --- Accept Button Prank (Runs Away) ---
+    function moveButtonRandomly() {
+      if (!prankActive) return;
+
+      // Switch to fixed positioning for whole-page free movement
+      btnAccept.style.position = 'fixed';
+      
+      const btnRect = btnAccept.getBoundingClientRect();
+      
+      // Calculate random positions within the entire viewport
+      const maxX = window.innerWidth - btnRect.width;
+      const maxY = window.innerHeight - btnRect.height;
+      
+      const randomX = Math.max(0, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(0, Math.floor(Math.random() * maxY));
+
+      btnAccept.style.left = `${randomX}px`;
+      btnAccept.style.top = `${randomY}px`;
+    }
+
+    btnAccept.addEventListener('mouseover', moveButtonRandomly);
+    btnAccept.addEventListener('touchstart', moveButtonRandomly);
+
+    btnAccept.addEventListener('click', () => {
+      if (currentGiftIndex === 4) {
+        // User accepted the final gift!
+        modalTitle.innerHTML = '🎉 Congratulations!<br><span style="font-size: 16px; color: var(--neon-blue);">You finally found your real birthday gift! ❤️</span>';
+        btnAccept.style.display = 'none';
+        fireConfetti();
+      } else {
+        // Technically they managed to click the prank button (hard but possible)
+        // We can just treat it as a reject or mock them
+        showToast("Nice try, but you can't click that! 😂");
+      }
+    });
+
+    // --- Reject Logic ---
+    btnReject.addEventListener('click', () => {
+      if (currentGiftIndex !== null) {
+        document.getElementById(`gift-${currentGiftIndex}`).classList.add('rejected');
+      }
+      closeModal();
+      showToast("Acha... next gift try karo 😂");
+    });
+
+    function showToast(msg) {
+      toastEl.innerText = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, 3000);
+    }
+
+    // --- Confetti ---
+    function fireConfetti() {
+      const duration = 15 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+      function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+        const particleCount = 50 * (timeLeft / duration);
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+      }, 250);
+    }
+
+    // --- Background Stars ---
+    const starCanvas = document.getElementById('stars-canvas');
+    const starCtx = starCanvas.getContext('2d');
+    let stars = [];
+    function initStars() {
+      starCanvas.width = window.innerWidth;
+      starCanvas.height = window.innerHeight;
+      stars = [];
+      const isMobile = window.innerWidth < 768;
+      const numStars = isMobile ? 50 : 150;
+      for(let i=0; i<numStars; i++) {
+        stars.push({
+          x: Math.random() * starCanvas.width,
+          y: Math.random() * starCanvas.height,
+          r: Math.random() * 1.5 + 0.5,
+          alpha: Math.random(),
+          vAlpha: (Math.random() * 0.02) - 0.01
+        });
+      }
+    }
+    function drawStars() {
+      starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+      stars.forEach(s => {
+        s.alpha += s.vAlpha;
+        if (s.alpha <= 0.1 || s.alpha >= 1) s.vAlpha *= -1;
+        starCtx.beginPath();
+        starCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        starCtx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+        starCtx.fill();
+      });
+      requestAnimationFrame(drawStars);
+    }
+    window.addEventListener('resize', initStars);
+    initStars();
+    drawStars();
+  </script>
+</body>
+</html>
