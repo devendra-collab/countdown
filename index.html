@@ -753,6 +753,12 @@
   const TARGET_MONTH = 7; // July
   const TARGET_DAY = 15;
 
+  // Check if TODAY is the birthday — if so, celebrate immediately!
+  function isBirthdayToday() {
+    const now = new Date();
+    return now.getMonth() === (TARGET_MONTH - 1) && now.getDate() === TARGET_DAY;
+  }
+
   function getTarget(){
     const now = new Date();
     let year = now.getFullYear();
@@ -764,6 +770,11 @@
     const prev = new Date(target);
     prev.setFullYear(target.getFullYear()-1);
     return prev;
+  }
+
+  // If it's the birthday, celebrate right away!
+  if (isBirthdayToday()) {
+    celebrate();
   }
 
   let target = getTarget();
